@@ -40,5 +40,5 @@ action to the action list, values return the result of the function.
 
 You can use the OverScript.py utility to compile your script. Simply run it
 with a path to your script as the first argument and an optional second argument
-specifying the destination path of the compiled file. You can then past the
+specifying the destination path of the compiled file. You can then paste the
 contents of this file into the overwatch workshop.
