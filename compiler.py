@@ -561,12 +561,15 @@ class OverScriptCompiler():
 
         funcName = node.func.id
         args = node.args
+        kwargs = {}
+        for keyword in node.keywords:
+            kwargs[keyword.arg] = self._parseExpr(keyword.value)
 
         if not hasattr(owwlib, funcName):
             raise NotImplementedError("The function '%s' is not implemented." % funcName)
 
         func = getattr(owwlib, funcName)
-        return func(*args, self)
+        return func(self, *args, **kwargs)
 
     def _createArray(self, l):
 
