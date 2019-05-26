@@ -598,10 +598,32 @@ class OverScriptCompiler():
             elements = node.elts[:]
             l = map(self._parseExpr, elements)
             value = self._createArray(l)
+        elif isinstance(node, ast.BinOp):
+            value = self._parseBinaryOp(node)
         else:
             value = str(ast.literal_eval(node))
 
         return value
+
+    def _parseBinaryOp(self, node):
+
+        left = self._parseExpr(node.left)
+        right = self._parseExpr(node.right)
+        op = node.op
+        if isinstance(op, ast.Add):
+            return "Add(%s, %s)" % (left, right)
+        elif isinstance(op, ast.Sub):
+            return "Subtract(%s, %s)" % (left, right)
+        elif isinstance(op, ast.Mult):
+            return "Multiply(%s, %s)" % (left, right)
+        elif isinstance(op, ast.Div):
+            return "Divide(%s, %s)" % (left, right)
+        elif isinstance(op, ast.Mod):
+            return "Modulo(%s, %s)" % (left, right)
+        elif isinstance(op, ast.Pow):
+            return "Raise To Power(%s, %s)" % (left, right)
+        else:
+            raise RuntimeError("Unrecognized binary operator '%s'" % str(op))
 
     def _assign(self, node):
 

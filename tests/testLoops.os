@@ -4,4 +4,4 @@ def on_global_myFunction():
     i = 0
     while i < 10:
         appendToArray(some_var, i)
-        i = add(i, 1)
+        i = i + 1

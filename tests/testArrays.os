@@ -5,5 +5,5 @@ def on_global_testArrays():
     sum = 0
     for i in l:
         for j in [1, 2, 3]:
-            prod = mult(i, j)
-        sum = add(sum, prod)
+            prod = i * j
+        sum = sum + prod
