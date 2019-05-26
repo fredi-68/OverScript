@@ -16,7 +16,6 @@ Planned features include:
 	- utility functions
 	- automatic string building
 	- access player variables
-	- ~~complete implementation of a Python bytecode interpreter~~
 
 Known issues:
 
