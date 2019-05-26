@@ -36,6 +36,17 @@ equivalent, sometimes abreviated. However, in case the function has more than
 one word, I am using lowerCamelCase instead of spaces. Actions add the respective
 action to the action list, values return the result of the function.
 
+There are some special keywords and operators available as shorthands for commonly used values.
+
+	-The values Event Player, Victim and Attacker can be referred to using the keywords
+	player, victim and attacker respectively. Player variables may be accessed
+	through dotted attribute access (e.g. player.objective_state)
+
+	-The values Add, Subtract, Multiply, etc. are available through the standard
+	Python operators +, -, *, etc.
+
+	-Value In Array is available through subscript (e.g. myList[0])
+
 # How to turn your script into a workshop rule
 
 You can use the OverScript.py utility to compile your script. Simply run it
