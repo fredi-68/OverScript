@@ -560,6 +560,8 @@ class OverScriptCompiler():
         #to resolve into text and just return the result.
 
         funcName = node.func.id
+
+        #prepare arguments
         args = node.args
         kwargs = {}
         for keyword in node.keywords:
@@ -568,6 +570,7 @@ class OverScriptCompiler():
         if not hasattr(owwlib, funcName):
             raise NotImplementedError("The function '%s' is not implemented." % funcName)
 
+        #call function and return
         func = getattr(owwlib, funcName)
         return func(self, *args, **kwargs)
 
@@ -625,6 +628,10 @@ class OverScriptCompiler():
             return "Modulo(%s, %s)" % (left, right)
         elif isinstance(op, ast.Pow):
             return "Raise To Power(%s, %s)" % (left, right)
+        elif isinstance(op, ast.And):
+            return "And(%s, %s)" % (left, right)
+        elif isinstance(op, ast.Or):
+            return "Or(%s, %s)" % (left, right)
         else:
             raise RuntimeError("Unrecognized binary operator '%s'" % str(op))
 

@@ -36,6 +36,9 @@ def Vector(ctx, x, y, z):
 def Hero(ctx, h):
     return "Hero(%s)" % ctx._parseExpr(h)
 
+def Backward(ctx):
+    return "Backward"
+
 #-----------
 #Other
 #-----------
@@ -48,6 +51,36 @@ def isButtonHeld(ctx, player, button):
 
 def allDeadPlayers(ctx, team):
     return "All Dead Players(%s)" % ctx._parseExpr(team)
+
+def allHeroes(ctx):
+    return "All Heroes()"
+
+def allLivingPlayers(ctx, team):
+    return "All Living Players(%s)" % ctx._parseExpr(team)
+
+def allPlayers(ctx, team):
+    return "All Players(%s)" % ctx._parseExpr(team)
+
+def allPlayersNotOnObjective(ctx, team):
+    return "All Players Not On Objective(%s)" % ctx._parseExpr(team)
+
+def allPlayersOnObjective(ctx, team):
+    return "All Players On Objective(%s)" % ctx._parseExpr(team)
+
+def allowedHeroes(ctx, player):
+    return "Allowed Heroes(%s)" % ctx._parseExpr(player)
+
+def altitudeOf(ctx, player):
+    return "Altitude Of(%s)" % ctx._parseExpr(player)
+
+def angleDifference(ctx, value1, value2):
+    return "Angle Difference(%s, %s)" % (ctx._parseExpr(value1), ctx._parseExpr(value2))
+
+def arrayContains(ctx, array, value):
+    return "Array Contains(%s, %s)" % (ctx._parseExpr(array), ctx._parseExpr(value))
+
+def arraySlice(ctx, array, start, count):
+    return "Array Slice(%s, %s, %s)" % (ctx._parseExpr(array), ctx._parseExpr(start), ctx._parseExpr(count))
 
 #======================
 #BUILTIN PYTHON FUNCTIONS
