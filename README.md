@@ -43,7 +43,7 @@ There are some special keywords and operators available as shorthands for common
 	through dotted attribute access (e.g. player.objective_state)
 
 	-The values Add, Subtract, Multiply, etc. are available through the standard
-	Python operators +, -, *, etc.
+	Python operators +, -, *, etc. Augmentation assignments (like +=) are supported.
 
 	-Value In Array is available through subscript (e.g. myList[0])
 
