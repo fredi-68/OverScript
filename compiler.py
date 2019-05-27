@@ -5,6 +5,7 @@ import ast
 import logging
 
 import owwlib
+from string_parser import StringParser
 
 EVENTS = {
     "player": ("Ongoing - Each Player;", "All;", "All;"),
@@ -89,6 +90,7 @@ class OverScriptCompiler():
     def __init__(self):
 
         self._prepare()
+        self.stringParser = StringParser()
 
     def _prepare(self):
 
@@ -242,31 +244,6 @@ class OverScriptCompiler():
             self.addAction("Set Global Variable At Index(C, %i, Array Slice(Value In Array(Global Variable(C), %i), 0, Subtract(Count Of(Value In Array(Global Variable(C), %i)), 1)))" % (ind, ind, ind))
         else:
             self.addAction("Set Player Variable At Index(Event Player, C, %i, Array Slice(Value In Array(Player Variable(Event Player, C), %i), 0, Subtract(Count Of(Value In Array(Player Variable(Event Player, C), %i)), 1)))" % (ind, ind, ind))
-
-    def resolve_string(self, value):
-
-        """
-        Resolve a string into a String() chain as understood by the OWW.
-        """
-
-        #The way OWW deals with strings is weird...
-        #You can only select words from a predefined list but you cannot
-        #combine them just however you want - you have to use specific
-        #meta-words to combine them in various ways, which leads to huge
-        #chains of String() invocations.
-        #This method aims to deal with this problem by letting the programmer
-        #write strings as they expect to (for example 'Hello World!'), then
-        #translating them into the OWW system. The complicated part about this
-        #is figuring out how to partition the string to make it work in OWW.
-        #Punctuation uses different patterns than spaces and some combinations
-        #may not be possible at all. More research is required on what would
-        #be a good algorithmic idea to tackle this problem.
-
-        #UPDATE: Talked to some people and one of them had an implementation for
-        #a string resolver already worked out. Probably going to adapt that for
-        #this compiler but I may end up putting it inside its own separate module.
-
-        return "NotImplemented"
 
     def compile(self, source):
 
@@ -641,6 +618,16 @@ class OverScriptCompiler():
             return "And(%s, %s)" % (left, right)
         elif isinstance(op, ast.Or):
             return "Or(%s, %s)" % (left, right)
+        elif isinstance(op, ast.LShift):
+            #<< is used for string formatting.
+            #This requires the left side argument to be a string and
+            #the right side to be a tuple of elements
+            if not isinstance(node.left, ast.Str):
+                raise TypeError("Can't use string format operator here; Expected target of type '%s' but was '%s'" % (str(ast.Str), str(node.left.__class__)))
+            if not isinstance(node.right, ast.Tuple):
+                raise TypeError("Expected string format list of type '%s' but was '%s'" % (str(ast.Tuple), str(node.right.__class__)))
+            parameters = list(map(self._parseExpr, node.right.elts))
+            return self.stringParser.parse(self._parseExpr(node.left).lower(), parameters)
         else:
             raise RuntimeError("Unrecognized binary operator '%s'" % str(op))
 

@@ -1,6 +1,5 @@
 def on_global_test():
-    a = 1
-    a += 5
+    a = "Current Score: {0}" << (42,)
 
 def testUtilityFunction(a, b):
     return a + b
