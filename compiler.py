@@ -371,6 +371,8 @@ class OverScriptCompiler():
         elif isinstance(node, ast.Expr):
             self.addAction(self._parseExpr(node.value))
         elif isinstance(node, ast.AugAssign):
+            #Since we already have assignment and binary ops wokring,
+            #I'm just gonna cheese this one...
             binOpNode = ast.BinOp()
             binOpNode.left = node.target
             binOpNode.right = node.value
@@ -409,12 +411,12 @@ class OverScriptCompiler():
         body = node.body
         orelse = node.orelse
         ifInd = self.currentLine()
-        self.addAction("PLACEHOLDER")
+        self.addAction("PLACEHOLDER") #this will later test the condition and skip the else block
         if orelse:
             for i in orelse:
                 self._parseBody(i)
         elseInd = self.currentLine()
-        self.addAction("PLACEHOLDER")
+        self.addAction("PLACEHOLDER") #this will later skip the if block if the else block was executed
         for i in body:
             self._parseBody(i)
         end = self.currentLine()
