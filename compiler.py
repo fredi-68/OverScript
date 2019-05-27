@@ -363,7 +363,7 @@ class OverScriptCompiler():
         """
         
         if isinstance(node, ast.Assign):
-            self._currentRule.actions.append(self._assign(node))
+            self.addAction(self._assign(node))
         elif isinstance(node, ast.While):
             self._parseWhile(node)
         elif isinstance(node, ast.If):
@@ -371,7 +371,14 @@ class OverScriptCompiler():
         elif isinstance(node, ast.Expr):
             self.addAction(self._parseExpr(node.value))
         elif isinstance(node, ast.AugAssign):
-            raise RuntimeError("Augmentation assignments are not implemented yet.")
+            binOpNode = ast.BinOp()
+            binOpNode.left = node.target
+            binOpNode.right = node.value
+            binOpNode.op = node.op
+            assignNode = ast.Assign()
+            assignNode.targets = [node.target]
+            assignNode.value = binOpNode
+            self.addAction(self._assign(assignNode))
         elif isinstance(node, ast.For):
             self._parseFor(node)
         else:

@@ -1,5 +1,6 @@
 def on_global_test():
-    l = [1, 2, 3]
+    a = 1
+    a += 5
 
 def testUtilityFunction(a, b):
     return a + b

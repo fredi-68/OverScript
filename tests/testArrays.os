@@ -11,4 +11,4 @@ def on_global_testArrays():
     for i in l:
         for j in [1, 2, 3]:
             prod = i * j
-            sum = sum + prod
+            sum += prod
