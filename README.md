@@ -10,11 +10,11 @@ Currently supported features are:
 	- Basic control flow statements which work like you would expect (if/else, for, while)
 	- Support for list literals
 	- Support for many Python operators (assign, subscript, arithmetic, etc...)
+	- automatic string building
 
 Planned features include:
 
 	- utility functions
-	- automatic string building
 	- access player variables
 
 Known issues:
