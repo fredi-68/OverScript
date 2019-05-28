@@ -8,6 +8,6 @@ def test_arrays():
     l = [2, 4, 8]
     sum = 0
     for i in l:
-        for j in [1, 2, 3]:
+        for j in range(1, 4):
             prod = i * j
             sum += prod

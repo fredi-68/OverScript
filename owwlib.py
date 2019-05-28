@@ -1,6 +1,8 @@
 #Collection of Overwatch Workshop function calls
 #TODO: Extend this to cover all workshop actions and values
 
+_range = __builtins__["range"]
+
 #======================
 #ACTIONS
 #======================
@@ -92,9 +94,10 @@ def arraySlice(ctx, array, start, count):
 #BUILTIN PYTHON FUNCTIONS
 #======================
 
-def range(ctx, start, end, step):
+def range(ctx, *args):
 
-    return ctx._createArray(range(start, end, step))
+    #Bit dodgy this, may want to revise
+    return ctx._createArray(_range(*map(lambda x: int(ctx._parseExpr(x)), args)))
 
 #======================
 #OTHER
