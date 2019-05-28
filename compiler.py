@@ -154,7 +154,7 @@ class OverScriptCompiler():
 
         """
         Gets a global or player specific variable.
-        If the variable hasn't been declared, NameError is raised.
+        
         """
 
         if player is None:

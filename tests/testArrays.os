@@ -1,7 +1,5 @@
 @event("global")
 def test_arrays():
-    """Array Test"""
-
     #This test covers array literals, looping
     #over arrays, arithmetic and nested for loops.
     #It calculates the number 84 really inefficiently
