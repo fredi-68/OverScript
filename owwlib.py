@@ -15,6 +15,9 @@ def appendToArray(ctx, array, element):
 def applyImpulse(ctx, player, direction, speed, relative, motion):
     return "Apply Impulse(%s, %s, %s, %s, %s)" % (ctx._parseExpr(player), ctx._parseExpr(direction), ctx._parseExpr(speed), ctx._parseExpr(relative), ctx._parseExpr(motion))
 
+def bigMessage(ctx, visibleTo, header):
+    return "Big Message(%s, %s)" % (ctx._parseExpr(visibleTo), ctx._parseExpr(header))
+
 #======================
 #VALUES
 #======================
@@ -38,6 +41,9 @@ def Hero(ctx, h):
 
 def Backward(ctx):
     return "Backward"
+
+def Team(ctx, team):
+    return "Team(%s)" % ctx._parseExpr(team)
 
 #-----------
 #Other

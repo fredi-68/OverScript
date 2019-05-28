@@ -2,6 +2,7 @@
 #
 #Heavily inspired by Deltins ParseString algorithm
 #https://github.com/ItsDeltin/Overwatch-Script-To-Workshop/blob/91f6d89cae2dda77d40139a589c22077def7654f/Deltinteger/Deltinteger/Elements/Values.cs#L729
+#Parts copied are used with permission.
 
 import logging
 import re
@@ -42,7 +43,7 @@ class StringParser():
         """
 
         #Right so I don't have fancy incremental sorting like C# does.
-        #What I can do is split the list into multiple lists, then merge
+        #What I *can* do is split the list into multiple lists, then merge
 
         hasParam = []
         for i in self.words[:]:

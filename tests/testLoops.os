@@ -1,4 +1,5 @@
-def on_global_myFunction():
+@event("global")
+def my_function():
     """First test rule."""
     some_var = []
     i = 0

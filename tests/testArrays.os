@@ -1,4 +1,5 @@
-def on_global_testArrays():
+@event("global")
+def test_arrays():
     """Array Test"""
 
     #This test covers array literals, looping

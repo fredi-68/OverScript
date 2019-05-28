@@ -8,13 +8,13 @@ import owwlib
 from string_parser import StringParser
 
 EVENTS = {
-    "player": ("Ongoing - Each Player;", "All;", "All;"),
-    "global": ("Ongoing - Global;",),
-    "elimination": ("Player earned elimination;", "All;", "All;"),
-    "final_blow": ("Player dealt final blow;", "All;", "All;"),
-    "damage_dealt": ("Player dealt damage;", "All;", "All;"),
-    "damage_taken": ("Player took damage;", "All;", "All;"),
-    "death": ("Player Died;", "All;", "All;")
+    "player": "Ongoing - Each Player",
+    "global": "Ongoing - Global",
+    "elimination": "Player earned elimination",
+    "final_blow": "Player dealt final blow",
+    "damage_dealt": "Player dealt damage",
+    "damage_taken": "Player took damage",
+    "death": "Player Died"
     }
 
 OPERATORS = {
@@ -43,12 +43,12 @@ class Rule():
         Check whether or not this rule uses global or player specific events.
         """
 
-        return self.events == EVENTS["global"]
+        return self.events[0] == EVENTS["global"]
 
     def __str__(self):
 
-        events = """\tevent\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(self.events)
-        conditions = """""" #not currently used
+        events = """\tevent\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x.title()+";", self.events))
+        conditions = """\tconditions\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x+";", self.conditions))
         actions = """\tactions\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x+";", self.actions))
 
         return """rule("%s")\n{\n%s\n%s\n%s}\n""" % (self.name, events, conditions, actions)
@@ -159,11 +159,17 @@ class OverScriptCompiler():
 
         if player is None:
             if not name in self.global_var_names:
-                raise NameError("Name '%s' is not defined" % name)
+                #create variable
+
+                #we don't actually do anything with the returned string,
+                #we just want to update the mapping
+                self.setVariable(name, 0, player) 
+                #raise NameError("Name '%s' is not defined" % name)
             return "Value In Array(Global Variable(A), %i)" % self.global_var_names[name]
         else:
             if not name in self.player_var_names:
-                raise NameError("Name '%s' is not defined" % name)
+                self.setVariable(name, 0, player)
+                #raise NameError("Name '%s' is not defined" % name)
             return "Value In Array(Player Variable(%s, A), %i)" % (player, self.player_var_names[name])
 
     def modifyVariable(self, name, action, element, player=None):
@@ -260,7 +266,7 @@ class OverScriptCompiler():
         self.logger.debug("Reading function definitions...")
         for rule in tree.body:
             if isinstance(rule, ast.FunctionDef):
-                if rule.name.startswith("on_"):
+                if rule.decorator_list:
                     #Event handler function
                     self._parseFunctionDefAsRule(rule)
                 else:
@@ -289,25 +295,41 @@ class OverScriptCompiler():
 
         fName = node.name
         self.logger.debug("Creating new rule from function '%s'" % fName)
-        self.logger.debug("Checking if docstring is present...")
-        docstring = ast.get_docstring(node)
-        skip_first = False
-        if not docstring:
-            docstring = "Custom Rule #%i" % (len(self.rules) + 1)
-        else:
-            #The docstring appears as an expression in the function body so
-            #we have to skip it during parsing of the function
-            skip_first = True
-        rName = fName[3:].split("_", 1) #Skip event header
-        if len(rName) > 1:
-            e, rName = rName
-        else:
-            e = rName
-        try:
-            event_type = EVENTS[e]
-        except KeyError:
-            raise RuntimeError("Unknown event type '%s'" % rName)
-        rule = Rule(docstring, event_type)
+        self.logger.debug("Processing rule decorators...")
+
+        event_type = ()
+        conditions = []
+
+        for dec in node.decorator_list:
+            f = dec.func
+            if f.id == "event":
+                if not event_type:
+                    try:
+                        args = list(map(lambda x: x.s, dec.args))
+                    except AttributeError:
+                        raise TypeError("Event value must be of type str")
+                    if args:
+                        event_type = (EVENTS[args[0]], *args[1:])
+                    else:
+                        raise ValueError("@event needs at least one argument")
+                else:
+                    raise RuntimeError("Only one instance of 'event' decorator allowed per rule.")
+            elif f.id == "trigger":
+                for arg in dec.args:
+                    conditions.append(self._parseExpr(arg) + " == True")
+            else:
+                raise ValueError("Only 'event' and 'trigger' are allowed as function decorators.")
+
+        #Cleanup
+        #conditions may be empty but event_type may not. If it is,
+        #we can either raise an exception or substitute a default value.
+        #We will use the default Ongoing - Global
+        if not event_type:
+            event_type = ("Ongoing - Global;",)
+
+        #create rule
+        rule = Rule(fName, event_type)
+        rule.conditions = conditions
         self._currentRule = rule
         self.rules.append(rule)
 
@@ -319,7 +341,7 @@ class OverScriptCompiler():
         rule.actions.append("Skip(%s)" % skipAction)
 
         #Parse actions
-        for expr in node.body[skip_first:]: #something something booleans are integers
+        for expr in node.body:
             self._parseBody(expr)
 
         if rule.loopCount > 0:
@@ -592,6 +614,8 @@ class OverScriptCompiler():
             value = self._createArray(l)
         elif isinstance(node, ast.BinOp):
             value = self._parseBinaryOp(node)
+        elif isinstance(node, ast.Compare):
+            value = self._parseCompare(node)
         else:
             value = str(ast.literal_eval(node))
 

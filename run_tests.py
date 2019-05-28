@@ -6,7 +6,10 @@ from compiler import OverScriptCompiler
 import pathlib
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+if __debug__:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 logging.info("Compiling test scripts...")
 comp = OverScriptCompiler()
