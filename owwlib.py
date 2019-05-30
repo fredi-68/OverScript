@@ -1,4 +1,16 @@
 #Collection of Overwatch Workshop function calls
+
+#This module contains a number of functions callable from within
+#OverScript. Each function takes a variable amount of arguments,
+#however, it is always passed at least one argument, which is
+#the current compiler instance. Thus, each function defined here
+#has access to the complete compiler state, variable mappings,
+#loop and function stacks and already defined rules and actions.
+#The function then may insert an arbitrary amount of actions
+#into the current rule before returning.
+#Each function should return a string specifying the value or
+#action requested for the current context.
+
 #TODO: Extend this to cover all workshop actions and values
 
 #Copyright (c) 2019 fredi_68
