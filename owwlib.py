@@ -57,17 +57,23 @@ def abs(ctx, x):
 #Datatypes
 #-----------
 
-def Vector(ctx, x, y, z):
+def vector(ctx, x, y, z):
     return "Vector(%s, %s, %s)" % (ctx._parseExpr(x), ctx._parseExpr(y), ctx._parseExpr(z))
 
-def Hero(ctx, h):
+def hero(ctx, h):
     return "Hero(%s)" % ctx._parseExpr(h)
 
-def Backward(ctx):
+def backward(ctx):
     return "Backward"
 
-def Team(ctx, team):
+def team(ctx, team):
     return "Team(%s)" % ctx._parseExpr(team)
+
+def victim(ctx):
+    return "Victim"
+
+def attacker(ctx):
+    return "Attacker"
 
 #-----------
 #Other

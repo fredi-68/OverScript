@@ -624,7 +624,6 @@ class OverScriptCompiler():
             else:
                 value = self.getVariable(node.id)
         elif isinstance(node, ast.Subscript):
-            #TODO: This currently only works for global variables as array targets
             array = self._parseExpr(node.value)
             ind = self._parseExpr(node.slice.value)
             value = "Value In Array(%s, %s)" % (array, ind)

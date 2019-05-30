@@ -4,5 +4,5 @@
 @trigger(isButtonHeld(player, "Interact"))
 def hover():
 	while True == True:
-		applyImpulse(player, Vector(0, 1, 0), 5, "To World", "Cancel Contrary Motion")
+		applyImpulse(player, vector(0, 1, 0), 5, "To World", "Cancel Contrary Motion")
 		wait(0.015)
