@@ -15,6 +15,7 @@ Currently supported features are:
 Planned features include:
 
 	- utility functions
+	- support for elif clauses
 
 Known issues:
 
