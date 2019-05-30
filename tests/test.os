@@ -1,7 +1,7 @@
-@event("global")
-@trigger(True == True)
+@event("player", "all", "all")
 def myNewRule():
-    a = 42
+    player.my_variable = 20
+    my_global = player.my_variable
 
 def testUtilityFunction(a, b):
     return a + b

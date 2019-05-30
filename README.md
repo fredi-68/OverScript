@@ -5,7 +5,7 @@ which can be pasted into the Overwatch Workshop (sometimes also called 'transpil
 
 Currently supported features are:
 
-	- Infinite variables (currently global only)
+	- Infinite variables
 	- Named variables with implicit declaration
 	- Basic control flow statements which work like you would expect (if/else, for, while)
 	- Support for list literals
@@ -19,7 +19,7 @@ Planned features include:
 
 Known issues:
 
-	- There is currently no way to create and modify player variables, this is planned.
+	- Some operations currently only work on global variables
 	- If your rule contains a loop, it will have a startup delay of 0.001 seconds.
 
 

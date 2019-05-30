@@ -636,6 +636,14 @@ class OverScriptCompiler():
             value = self._parseBinaryOp(node)
         elif isinstance(node, ast.Compare):
             value = self._parseCompare(node)
+        elif isinstance(node, ast.Attribute):
+            base = node.value
+            attr = node.attr
+            if base.id == "player":
+                player = "Event Player"
+            else:
+                player = base.id
+            value = self.getVariable(attr, player)
         else:
             value = str(ast.literal_eval(node))
 
@@ -686,6 +694,19 @@ class OverScriptCompiler():
         if len(targets) > 1:
             raise SyntaxError("List unpacking is not supported by OverScript.")
         target = targets[0]
+        
         value = self._parseExpr(node.value)
 
-        return self.setVariable(target.id, value)
+        #Determine target
+        if isinstance(target, ast.Name):
+            return self.setVariable(target.id, value)
+        elif isinstance(target, ast.Attribute):
+            base = target.value
+            attr = target.attr
+            if base.id == "player":
+                player = "Event Player"
+            else:
+                player = base.id
+            return self.setVariable(attr, value, player)
+        else:
+            raise RuntimeError("Unexpected assignment target node type: '%s'" % str(target.__class__))
