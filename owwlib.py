@@ -45,8 +45,7 @@ def wait(ctx, time):
     return "Wait(%s, Ignore Condition)" % ctx._parseExpr(time)
 
 def appendToArray(ctx, array, element):
-    #TODO: This currently only works for global variables as array targets
-    return ctx.modifyVariable(array.id, "Append To Array", ctx._parseExpr(element))
+    return "Append To Array(%s, %s)" % (ctx._parseExpr(array), ctx._parseExpr(element))
 
 def applyImpulse(ctx, player, direction, speed, relative, motion):
     return "Apply Impulse(%s, %s, %s, %s, %s)" % (ctx._parseExpr(player), ctx._parseExpr(direction), ctx._parseExpr(speed), ctx._parseExpr(relative), ctx._parseExpr(motion))
