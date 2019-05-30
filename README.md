@@ -15,7 +15,6 @@ Currently supported features are:
 Planned features include:
 
 	- utility functions
-	- access player variables
 
 Known issues:
 
