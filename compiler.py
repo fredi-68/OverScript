@@ -293,18 +293,6 @@ class OverScriptCompiler():
                     self._parseFunctionDefAsUtility(rule)
 
         self.logger.debug("Building ruleset...")
-        #Initialize registers
-        #TODO: Add check in variable D to make sure rules don't execute before
-        #registers have been initialized
-
-        #rule = Rule("Initialize Registers - DO NOT REMOVE", EVENTS["player"])
-        #rule.actions.append("Set Player Variable(Event Player, A, Empty Array)")
-        #rule.actions.append("Set Global Variable(A, Empty Array)")
-        #rule.actions.append("Set Player Variable(Event Player, B, Empty Array)")
-        #rule.actions.append("Set Global Variable(B, Empty Array)")
-        #rule.actions.append("Set Player Variable(Event Player, C, Empty Array)")
-        #rule.actions.append("Set Global Variable(C, Empty Array)")
-        #self.code += str(rule)
         
         self.code += "\n\n".join(map(str, self.rules))
 
