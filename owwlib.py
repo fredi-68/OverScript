@@ -129,6 +129,9 @@ def arrayContains(ctx, array, value):
 def arraySlice(ctx, array, start, count):
     return "Array Slice(%s, %s, %s)" % (ctx._parseExpr(array), ctx._parseExpr(start), ctx._parseExpr(count))
 
+def countOf(ctx, array):
+    return "Count Of(%s)" % ctx._parseExpr(array)
+
 #======================
 #BUILTIN PYTHON FUNCTIONS
 #======================
@@ -144,7 +147,9 @@ def arraySlice(ctx, array, start, count):
 def range(ctx, *args):
 
     #Bit dodgy this, may want to revise
-    return ctx._createArray(_range(*map(lambda x: int(ctx._parseExpr(x)), args)))
+    return ctx._create_1d_array(_range(*map(lambda x: int(ctx._parseExpr(x)), args)))
+
+len = countOf
 
 #======================
 #OTHER

@@ -46,6 +46,12 @@ OPERATORS = {
     "GtE": ">="
     }
 
+class TOS():
+
+    def __init__(self):
+
+        self.i = 0
+
 class Rule():
 
     def __init__(self, name, events):
@@ -100,6 +106,9 @@ class OverScriptCompiler():
         A - [Array] Variables
         B - [Array] Loop branch state
         C - [Array] Loop iteration state
+        D - [Array] Array assembly stack
+        E - Array assembly source
+        F - Array assembly target
 
     In addition, OSC will create a rule titled 'Initialize Registers'.
     DO NOT REMOVE THIS RULE, AS IT MAY BREAK YOUR SCRIPT.
@@ -590,15 +599,7 @@ class OverScriptCompiler():
         func = getattr(owwlib, funcName)
         return func(self, *args, **kwargs)
 
-    def _createArray(self, l):
-
-        value = "Empty Array"
-        
-        for v in l:
-            value = "Append To Array(%s, %s)" % (value, v)
-        return value
-
-    def _parseExpr(self, node):
+    def _parseExpr(self, node, parse_array=True):
 
         """
         Parse an expression yielding some value.
@@ -616,9 +617,7 @@ class OverScriptCompiler():
             ind = self._parseExpr(node.slice.value)
             value = "Value In Array(%s, %s)" % (array, ind)
         elif isinstance(node, (ast.List, ast.Tuple)):
-            elements = node.elts[:]
-            l = map(self._parseExpr, elements)
-            value = self._createArray(l)
+            value = self._parseArray(node, parse_array)
         elif isinstance(node, ast.BinOp):
             value = self._parseBinaryOp(node)
         elif isinstance(node, ast.Compare):
@@ -697,3 +696,120 @@ class OverScriptCompiler():
             return self.setVariable(attr, value, player)
         else:
             raise RuntimeError("Unexpected assignment target node type: '%s'" % str(target.__class__))
+        
+    #==================
+    #ARRAY ASSEMBLY
+    #==================
+        
+    def _array_clear(self, target, player=None):
+
+        if player:
+            self.addAction("Set Player Variable(%s, %s, Empty Array)" % (player, target))
+        else:
+            self.addAction("Set Global Variable(%s, Empty Array)" % target)
+
+    def _array_esc(self, source, target, player=None):
+        
+        """
+        'escape' a value by embedding it into an array
+        """
+
+        self._array_clear(target, player)
+        if player:
+            self.addAction("Set Player Variable At Index(%s, %s, 0, Player Variable(%s, %s))" % (player, target, player, source))
+        else:
+            self.addAction("Set Global Variable At Index(%s, 0, Global Variable(%s))" % (target, source))
+
+    def _array_esc_val(self, source, target, player=None):
+
+        self._array_clear(target, player)
+        if player:
+            self.addAction("Set Player Variable At Index(%s, %s, 0, %s)" % (player, target, source))
+        else:
+            self.addAction("Set Global Variable At Index(%s, 0, %s)" % (target, source))
+
+    def _array_ata(self, source, target, index, player=None):
+
+        """
+        append to array
+        """
+
+        if player:
+            return "Append To Array(%s, Value In Array(Player Variable(%s, %s), %i))" % (target, player, source, index)
+        else:
+            return "Append To Array(%s, Value In Array(Global Variable(%s), %i))" % (target, source, index)
+
+    def _array_set(self, target, value, player=None):
+
+        if player:
+            self.addAction("Set Player Variable(%s, %s, %s)" % (player, target, value))
+        else:
+            self.addAction("Set Global Variable(%s, %s)" % (target, value))
+
+    def _array_push_stack(self, target, source, index, player=None):
+
+        if player:
+            self.addAction("Set Player Variable At Index(%s, %s, %i, Player Variable(%s, %s))" % (player, target, index, player, source))
+        else:
+            self.addAction("Set Global Variable At Index(%s, %i, Global Variable(%s))" % (target, index, source))
+
+    def _array_build(self, tos, array):
+
+        """
+        build an n dimensional array
+        """
+
+        player = None if self._currentRule.isGlobal() else "Event Player"
+
+        #if this is a literal, return escape directly
+        if not isinstance(array, list):
+            self._array_set("E", array, player)
+            self._array_esc("E", "F", player)
+            self._array_push_stack("D", "F", tos.i, player)
+            tos.i += 1
+            return
+
+        #otherwise, build all subarrays
+        for i in range(len(array)):
+            self._array_build(tos, array[i])
+
+        #build next array
+        value = "Empty Array"
+        ind = tos.i - len(array)
+        for i in range(len(array)):
+            value = self._array_ata("D", value, ind+i, player)
+        tos.i -= len(array)
+        self._array_esc_val(value, "F", player)
+        self._array_push_stack("D", "F", tos.i, player)
+        tos.i += 1
+        return
+
+    def _create_1d_array(self, l):
+
+        value = "Empty Array"
+        
+        for v in l:
+            value = "Append To Array(%s, %s)" % (value, v)
+        return value
+
+    def _parseArray(self, node, parse_array=True):
+
+        elements = node.elts[:]
+        l = list(map(self._parseExpr, elements, [False] * len(elements)))
+        if not parse_array:
+            return l
+
+        #check dimensions
+        for e in l:
+            if isinstance(e, (tuple, list)):
+                break
+        else:
+            #one dimensional array, use normal array assembly
+            return self._create_1d_array(l)
+
+        #n dimensional array
+        self._array_build(TOS(), l)
+
+        if self._currentRule.isGlobal():
+            return "Value In Array(Value In Array(Global Variable(D), 0), 0)"
+        return "Value In Array(Value In Array(Player Variable(Event Player, D), 0), 0)"
