@@ -808,6 +808,10 @@ class OverScriptCompiler():
             return self._create_1d_array(l)
 
         #n dimensional array
+        #NOTE: I'm using TOS as a wrapper class to get mutable
+        #integers. This could be done with just normal integers
+        #by returning the stack offsets and then calculating the
+        #new one based on that but I couldn't be bothered
         self._array_build(TOS(), l)
 
         if self._currentRule.isGlobal():
