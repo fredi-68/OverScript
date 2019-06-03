@@ -109,9 +109,6 @@ class OverScriptCompiler():
         D - [Array] Array assembly stack
         E - Array assembly source
         F - Array assembly target
-
-    In addition, OSC will create a rule titled 'Initialize Registers'.
-    DO NOT REMOVE THIS RULE, AS IT MAY BREAK YOUR SCRIPT.
     """
 
     logger = logging.getLogger("OSCompiler")
@@ -350,18 +347,19 @@ class OverScriptCompiler():
         self._currentRule = rule
         self.rules.append(rule)
 
-        #Setup loop branch instruction
-        if rule.isGlobal():
-            skipAction = "Value In Array(Global Variable(B), %i)" % self.ruleID()
-        else:
-            skipAction = "Value In Array(Player Variable(%s, B), %i)" % ("Event Player", self.ruleID())
-        rule.actions.append("Skip(%s)" % skipAction)
+
 
         #Parse actions
         for expr in node.body:
             self._parseBody(expr)
 
         if rule.loopCount > 0:
+            #Setup loop branch instruction
+            if rule.isGlobal():
+                skipAction = "Value In Array(Global Variable(B), %i)" % self.ruleID()
+            else:
+                skipAction = "Value In Array(Player Variable(%s, B), %i)" % ("Event Player", self.ruleID())
+            rule.actions.insert(0, "Skip(%s)" % skipAction)
             rule.actions.insert(0, "Wait(0.001, Ignore Condition)")
 
     def _resolveUtilityFunction(self, func_name, args, kwargs):
