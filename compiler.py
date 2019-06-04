@@ -54,9 +54,10 @@ class TOS():
 
 class Rule():
 
-    def __init__(self, name, events):
+    def __init__(self, name, events, docstring=""):
 
         self.name = name
+        self.docstring = docstring
         self.events = events
         self.conditions = []
         self.actions = []
@@ -77,7 +78,11 @@ class Rule():
         conditions = """\tconditions\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x+";", self.conditions))
         actions = """\tactions\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x, self.actions))
 
-        return """rule("%s")\n{\n%s\n%s\n%s}\n""" % (self.name, events, conditions, actions)
+        docstring = ""
+        if self.docstring:
+            docstring = "/*\n%s\n*/\n" % self.docstring
+
+        return """rule("%s")\n%s{\n%s\n%s\n%s}\n""" % (self.name, docstring, events, conditions, actions)
 
 class OverScriptCompiler():
 
@@ -356,16 +361,19 @@ class OverScriptCompiler():
         if not event_type:
             event_type = ("Ongoing - Global;",)
 
+        docstr = ast.get_docstring(node)
+        skip_docstr = bool(docstr)
+        if self.optimize or not skip_docstr:
+            docstr = ""
+
         #create rule
-        rule = Rule(fName, event_type)
+        rule = Rule(fName, event_type, docstring=docstr)
         rule.conditions = conditions
         self._currentRule = rule
         self.rules.append(rule)
 
-
-
         #Parse actions
-        for expr in node.body:
+        for expr in node.body[skip_docstr:]:
             self._parseBody(expr)
 
         if rule.loopCount > 0:

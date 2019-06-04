@@ -1,9 +1,12 @@
 @event("global")
 def test_arrays():
-    #This test covers array literals, looping
-    #over arrays, arithmetic and nested for loops.
-    #It calculates the number 84 really inefficiently
-    #and stores it in the variable 'sum'
+
+    """
+    This test covers array literals, looping
+    over arrays, arithmetic and nested for loops.
+    It calculates the number 84 really inefficiently
+    and stores it in the variable 'sum'
+    """
 
     l = [2, 4, 8]
     sum = 0
