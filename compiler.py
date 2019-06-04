@@ -48,13 +48,32 @@ OPERATORS = {
 
 class TOS():
 
+    """
+    Top Of Stack wrapper class providing
+    mutable integers because I'm lazy
+    """
+
     def __init__(self):
 
         self.i = 0
 
 class Rule():
 
+    """
+    Dataclass for Overwatch Workshop rules
+    """
+
     def __init__(self, name, events, docstring=""):
+
+        """
+        Create a new rule.
+        name is the name of the rule and will be displayed in
+        the rule browser in the game.
+        events should be a tuple containing string arguments
+        used for determining event type.
+        docstring if provided, should be a string which will
+        be inserted into the final code as a comment
+        """
 
         self.name = name
         self.docstring = docstring
@@ -165,6 +184,10 @@ class OverScriptCompiler():
         return len(self.rules) - 1
 
     def addAction(self, action):
+
+        """
+        Adds an action to the current rule
+        """
 
         self._currentRule.actions.append(action + ";" + (" //" + self._currentComment if self._currentComment and not self.optimize else ""))
         self._currentComment = ""
@@ -327,6 +350,10 @@ class OverScriptCompiler():
 
     def _parseFunctionDefAsRule(self, node):
 
+        """
+        Parse a function definition as a new rule.
+        """
+
         fName = node.name
         self.logger.debug("Creating new rule from function '%s'" % fName)
         self.logger.debug("Processing rule decorators...")
@@ -387,9 +414,18 @@ class OverScriptCompiler():
 
     def _resolveUtilityFunction(self, func_name, args, kwargs):
 
+        """
+        Resolves a name to a sequence of actions depending on the
+        specified func_name function.
+        """
+
         pass
 
     def _parseFunctionDefAsUtility(self, node):
+
+        """
+        Parse a function definition node as a utility function.
+        """
 
         self._utilityFunctions[node.name] = node
 
@@ -724,6 +760,10 @@ class OverScriptCompiler():
         
     def _array_clear(self, target, player=None):
 
+        """
+        Clears the specified variable.
+        """
+
         if player:
             self.addAction("Set Player Variable(%s, %s, Empty Array)" % (player, target))
         else:
@@ -742,6 +782,10 @@ class OverScriptCompiler():
             self.addAction("Set Global Variable At Index(%s, 0, Global Variable(%s))" % (target, source))
 
     def _array_esc_val(self, source, target, player=None):
+
+        """
+        same as _array_esc but using a value instead of a variable for the source
+        """
 
         self._array_clear(target, player)
         if player:
@@ -762,12 +806,22 @@ class OverScriptCompiler():
 
     def _array_set(self, target, value, player=None):
 
+        """
+        Set variable
+        """
+
         if player:
             self.addAction("Set Player Variable(%s, %s, %s)" % (player, target, value))
         else:
             self.addAction("Set Global Variable(%s, %s)" % (target, value))
 
     def _array_push_stack(self, target, source, index, player=None):
+
+        """
+        Stack insertion operations.
+        Inserts the value in variable source into the stack in variable
+        target at the specified index.
+        """
 
         if player:
             self.addAction("Set Player Variable At Index(%s, %s, %i, Player Variable(%s, %s))" % (player, target, index, player, source))
@@ -807,6 +861,10 @@ class OverScriptCompiler():
 
     def _create_1d_array(self, l):
 
+        """
+        Create a 1-dimensional array using a simpler algorithm
+        """
+
         value = "Empty Array"
         
         for v in l:
@@ -814,6 +872,13 @@ class OverScriptCompiler():
         return value
 
     def _parseArray(self, node, parse_array=True):
+
+        """
+        Create an array from a literal.
+        if parse_array is True, this will parse the array into a
+        value string and return it. Otherwise, the Python list
+        object will be returned instead.
+        """
 
         elements = node.elts[:]
         l = list(map(self._parseExpr, elements, [False] * len(elements)))
