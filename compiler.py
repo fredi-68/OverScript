@@ -113,7 +113,9 @@ class OverScriptCompiler():
 
     logger = logging.getLogger("OSCompiler")
 
-    def __init__(self):
+    def __init__(self, optimize=False):
+
+        self.optimize = optimize
 
         self._prepare()
         self.stringParser = StringParser()
