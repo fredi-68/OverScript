@@ -75,7 +75,7 @@ class Rule():
 
         events = """\tevent\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x.title()+";", self.events))
         conditions = """\tconditions\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x+";", self.conditions))
-        actions = """\tactions\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x+";", self.actions))
+        actions = """\tactions\n\t{\n\t\t%s\n\t}\n""" % "\n\t\t".join(map(lambda x: x, self.actions))
 
         return """rule("%s")\n{\n%s\n%s\n%s}\n""" % (self.name, events, conditions, actions)
 
@@ -115,6 +115,15 @@ class OverScriptCompiler():
 
     def __init__(self, optimize=False):
 
+        """
+        Create a new compiler instance.
+
+        optimize controls the level of output space optimization performed by the compiler.
+            The compiler always uses all code optimizations available, but many things such as
+            comments or additional linebreaks and spaces for better readability may be omitted
+            if optimize=False.
+        """
+
         self.optimize = optimize
 
         self._prepare()
@@ -125,6 +134,7 @@ class OverScriptCompiler():
         self.rules = []
         self._utilityFunctions = {}
         self._currentRule = None
+        self._currentComment = ""
 
         self.global_var_names = {}
         self.player_var_names = {}
@@ -151,7 +161,8 @@ class OverScriptCompiler():
 
     def addAction(self, action):
 
-        self._currentRule.actions.append(action)
+        self._currentRule.actions.append(action + ";" + (" //" + self._currentComment if self._currentComment and not self.optimize else ""))
+        self._currentComment = ""
 
     def setVariable(self, name, value, player=None):
 
@@ -160,6 +171,7 @@ class OverScriptCompiler():
         The variable will be created if it doesn't exist already.
         """
 
+        self._currentComment += "var %s; " % name
         if player is None:
             self.logger.debug("Setting global variable '%s'..." % name)
             if name in self.global_var_names:
@@ -185,6 +197,7 @@ class OverScriptCompiler():
         
         """
 
+        self._currentComment += "var %s; " % name
         if player is None:
             if not name in self.global_var_names:
                 #create variable
@@ -361,8 +374,8 @@ class OverScriptCompiler():
                 skipAction = "Value In Array(Global Variable(B), %i)" % self.ruleID()
             else:
                 skipAction = "Value In Array(Player Variable(%s, B), %i)" % ("Event Player", self.ruleID())
-            rule.actions.insert(0, "Skip(%s)" % skipAction)
-            rule.actions.insert(0, "Wait(0.001, Ignore Condition)")
+            rule.actions.insert(0, "Skip(%s);" % skipAction)
+            rule.actions.insert(0, "Wait(0.001, Ignore Condition);")
 
     def _resolveUtilityFunction(self, func_name, args, kwargs):
 
@@ -437,13 +450,13 @@ class OverScriptCompiler():
             self._parseBody(i)
         end = self.currentLine()
 
-        self._currentRule.actions[elseInd] = "Skip(%i)" % (end - elseInd - 1) #skip if block in else block
+        self._currentRule.actions[elseInd] = "Skip(%i);" % (end - elseInd - 1) #skip if block in else block
 
         #Now that we know what our action pointers need to be set to,
         #we can create the actual If statement
 
         expr = self._parseCompare(node.test)
-        self._currentRule.actions[ifInd] = "Skip If(%s, %i)" % (expr, elseInd - ifInd)
+        self._currentRule.actions[ifInd] = "Skip If(%s, %i);" % (expr, elseInd - ifInd)
 
     def _parseCompare(self, node):
 
@@ -521,7 +534,7 @@ class OverScriptCompiler():
         #add loop instruction
         self.addAction("Loop()")
         #replace placeholder with condition test
-        self._currentRule.actions[currentInd] = "Skip If(Not(%s), %i)" % (expr, (self.currentLine() - currentInd) - 1)
+        self._currentRule.actions[currentInd] = "Skip If(Not(%s), %i);" % (expr, (self.currentLine() - currentInd) - 1)
         #reset loop branch target
         self.setLoopBranch(lastLoopBranch)
 
@@ -568,7 +581,7 @@ class OverScriptCompiler():
         #add loop instruction
         self.addAction("Loop()")
         #replace skip placeholder
-        self._currentRule.actions[skipInd] = "Skip If(Compare(Count Of(%s), <=, %s), %i)" % (iter, self.getLoopIteration(), (self.currentLine() - skipInd) - 1)
+        self._currentRule.actions[skipInd] = "Skip If(Compare(Count Of(%s), <=, %s), %i);" % (iter, self.getLoopIteration(), (self.currentLine() - skipInd) - 1)
         #reset loop branch target and loop index
         self.setLoopBranch(lastBranch)
         self.pullLoopIteration()

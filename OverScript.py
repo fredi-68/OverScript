@@ -25,7 +25,7 @@ import logging
 import os
 
 SUFFIX_INPUT = (".os", ".py", ".pyos")
-SUFFIX_OUTPUT = (".ows") #winner of the great 2019 overwatch workshop rule file extension vote (not representative)
+SUFFIX_OUTPUT = (".ows",) #winner of the great 2019 overwatch workshop rule file extension vote (not representative)
 
 log_levels = {
     0: logging.WARN,
@@ -59,7 +59,7 @@ for i in p_in:
         os.makedirs(target, exist_ok=True)
     else:
         target = path.parent
-    filename = path.name + SUFFIX_OUTPUT[0]
+    filename = path.stem + SUFFIX_OUTPUT[0]
     p = target / filename
     logging.info("Compiling file '%s'..." % str(path))
     with open(path, "r") as file_in:
