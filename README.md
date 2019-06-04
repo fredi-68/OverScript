@@ -65,6 +65,5 @@ To edit the event or condition settings for a rule, you can use function decorat
 # How to turn your script into a workshop rule
 
 You can use the OverScript.py utility to compile your script. Simply run it
-with a path to your script as the first argument and an optional second argument
-specifying the destination path of the compiled file. You can then paste the
+with a path to your script as the first argument. You can then paste the
 contents of this file into the overwatch workshop.
