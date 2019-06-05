@@ -41,8 +41,12 @@ _range = __builtins__["range"]
 #ACTIONS
 #======================
 
-def wait(ctx, time):
-    return "Wait(%s, Ignore Condition)" % ctx._parseExpr(time)
+def wait(ctx, time, cond=None):
+    if cond is None:
+        cond = "Ignore Condition"
+    else:
+        cond = ctx._parseExpr(cond)
+    return "Wait(%s, %s)" % (ctx._parseExpr(time), cond)
 
 def appendToArray(ctx, array, element):
     return "Append To Array(%s, %s)" % (ctx._parseExpr(array), ctx._parseExpr(element))
@@ -128,6 +132,9 @@ def arrayContains(ctx, array, value):
 
 def arraySlice(ctx, array, start, count):
     return "Array Slice(%s, %s, %s)" % (ctx._parseExpr(array), ctx._parseExpr(start), ctx._parseExpr(count))
+
+def closestPlayerTo(ctx, center, team):
+    return "Closest Player To(%s, %s)" % (ctx_parseExpr(center, team))
 
 def countOf(ctx, array):
     return "Count Of(%s)" % ctx._parseExpr(array)

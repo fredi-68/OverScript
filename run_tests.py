@@ -37,5 +37,5 @@ for file in pathlib.Path("./tests").iterdir():
     if file.suffix == ".os":
         logging.info("Compiling script '%s'..." % str(file))
         with open(file, "r") as f_in:
-            with open(file.with_suffix(".ow"), "w") as f_out:
+            with open(file.with_suffix(".ows"), "w") as f_out:
                 f_out.write(comp.compile(f_in.read()))

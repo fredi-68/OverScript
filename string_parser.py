@@ -13,7 +13,7 @@ class StringParser():
     PARAM_REPLACE_RE = re.compile("(\\\\{[0-9]\\\\})")
     PARAM_MATCH_RE = re.compile("^\\{([0-9])\\}")
 
-    logger = logging.getLogger("OVS.StringParser")
+    logger = logging.getLogger("OS.StringParser")
 
     def __init__(self, db_file="res/strings.txt"):
         

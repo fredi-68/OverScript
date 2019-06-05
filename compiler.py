@@ -137,7 +137,7 @@ class OverScriptCompiler():
 
     logger = logging.getLogger("OSCompiler")
 
-    def __init__(self, optimize=False):
+    def __init__(self, optimize=False, parseUnknownFunctions=False):
 
         """
         Create a new compiler instance.
@@ -149,6 +149,7 @@ class OverScriptCompiler():
         """
 
         self.optimize = optimize
+        self.parseUnknownFunctions = parseUnknownFunctions
 
         self._prepare()
         self.stringParser = StringParser()
@@ -643,6 +644,8 @@ class OverScriptCompiler():
 
         funcName = node.func.id
 
+        #TODO: add utility function calls here
+
         #prepare arguments
         args = node.args
         kwargs = {}
@@ -650,7 +653,19 @@ class OverScriptCompiler():
             kwargs[keyword.arg] = self._parseExpr(keyword.value)
 
         if not hasattr(owwlib, funcName):
-            raise NotImplementedError("The function '%s' is not implemented." % funcName)
+            if not self.parseUnknownFunctions:
+                raise NotImplementedError("The function '%s' is not implemented." % funcName)
+            else:
+                self.logger.info("Function '%s' not found, guessing signature from call node..." % funcName)
+                self.logger.debug("Parsing arguments as expression nodes...")
+                parsed_args = map(self._parseExpr, args)
+                if kwargs:
+                    self.logger.warn("Found non empty kwargs for unknown function, kwargs will be passed as positional args instead.")
+                    parsed_args.extend(kwargs.values())
+
+                func = "%s(%s)" % (funcName, ", ".join(parsed_args))
+                self.logger.debug("Calling unknown function '%s'" % (func))
+                return func
 
         #call function and return
         func = getattr(owwlib, funcName)

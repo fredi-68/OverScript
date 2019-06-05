@@ -4,6 +4,7 @@ def myNewRule():
 
     a = l[0]
     b = l[1]
+    c = cosineFromDegrees(a)
 
 def testUtilityFunction(a, b):
     return a + b

@@ -39,6 +39,7 @@ parser = argparse.ArgumentParser(description="CLI for the OverScript compiler")
 parser.add_argument("-v", "--verbose", action="count", default=0, help="Set logging level")
 parser.add_argument("-o", "--out", action="store", help="Set output file path")
 parser.add_argument("-O", "--optimize", action="store_true", help="optimize output")
+parser.add_argument("-g", "--guess", action="store_true", help="attempt to guess unknown functions instead of raising error")
 parser.add_argument("source", nargs="+")
 
 args = parser.parse_args()
@@ -48,7 +49,7 @@ else:
     logging.basicConfig(level=logging.DEBUG)
 
 p_in = args.source
-compiler = OverScriptCompiler(optimize=args.optimize)
+compiler = OverScriptCompiler(optimize=args.optimize, parseUnknownFunctions=args.guess)
 for i in p_in:
     path = pathlib.Path(i)
     if not path.exists():
