@@ -32,7 +32,7 @@ else:
     logging.basicConfig(level=logging.INFO)
 
 logging.info("Compiling test scripts...")
-comp = OverScriptCompiler(parseUnknownFunctions=True)
+comp = OverScriptCompiler(parseUnknownFunctions=False)
 for file in pathlib.Path("./tests").iterdir():
     if file.suffix == ".os":
         logging.info("Compiling script '%s'..." % str(file))

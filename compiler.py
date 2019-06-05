@@ -23,6 +23,7 @@
 
 import ast
 import logging
+import json
 
 import owwlib
 from string_parser import StringParser
@@ -163,6 +164,31 @@ class OverScriptCompiler():
 
         self._prepare()
         self.stringParser = StringParser()
+        self.HAS_JSON = True
+        self.logger.debug("Trying to load workshop.json...")
+        try:
+            self._load_workshop_json()
+        except OSError:
+            self.logger.debug("workshop.json not found, WSJSON not available")
+            self.HAS_JSON = False
+
+    def _load_workshop_json(self, path="res/workshop.json"):
+
+        self.workshop_functions = {}
+        with open(path, "r") as f:
+            d = json.load(f)
+
+        def camelCase(x):
+            words = x.split(" ")
+            if len(words) < 2:
+                return words[0].lower()
+            return "".join((words[0].lower(), *map(str.title, words[1:])))
+
+        for action in d["actions"]:
+            self.workshop_functions[camelCase(action["name"])] = (action["name"].title(), len(action["args"]))
+
+        for value in d["values"]:
+            self.workshop_functions[camelCase(value["name"])] = (value["name"].title(), len(value["args"]))
 
     def _prepare(self):
 
@@ -692,15 +718,26 @@ class OverScriptCompiler():
             return self._resolveUtilityFunction(funcName, args, kwargs)
 
         if not hasattr(owwlib, funcName):
+
+            self.logger.debug("Parsing arguments as expression nodes...")
+            parsed_args = list(map(self._parseExpr, args))
+            if kwargs:
+                self.logger.warn("Found non empty kwargs for unknown function, kwargs will be passed as positional args instead.")
+                parsed_args.extend(kwargs.values())
+            if self.HAS_JSON:
+                #use workshop.json to find function definition
+                if funcName in self.workshop_functions:
+                    canon_name, arg_count = self.workshop_functions[funcName]
+                    if len(parsed_args) != arg_count:
+                        raise TypeError("Unexpected number of arguments for function '%s' (%s): Expected %i but was %i." % (funcName, canon_name, arg_count, len(parsed_args)))
+                    func = "%s(%s)" % (canon_name, ", ".join(parsed_args))
+                    self.logger.debug("Calling WSJSON function '%s'" % (func))
+                    return func
+
             if not self.parseUnknownFunctions:
                 raise NotImplementedError("The function '%s' is not implemented." % funcName)
             else:
                 self.logger.info("Function '%s' not found, guessing signature from call node..." % funcName)
-                self.logger.debug("Parsing arguments as expression nodes...")
-                parsed_args = map(self._parseExpr, args)
-                if kwargs:
-                    self.logger.warn("Found non empty kwargs for unknown function, kwargs will be passed as positional args instead.")
-                    parsed_args.extend(kwargs.values())
 
                 func = "%s(%s)" % (funcName, ", ".join(parsed_args))
                 self.logger.debug("Calling unknown function '%s'" % (func))

@@ -24,6 +24,22 @@ Known issues:
 	- If your rule contains a loop, it will have a startup delay of 0.001 seconds.
 
 
+# A Note on workshop.json
+
+OverScript supports parsing information about actions/values from arxenix's Overwatch Workshop
+JSON documentation. Since not all of these are currently implemented natively, it is suggested
+to download workshop.json and place the file in the res folder in the compilers root directory.
+OSC will automatically load the file at startup and use it to resolve function calls to actions
+and values during compilation.
+If you can't use this feature for whatever reason, passing the -g flag to the compiler allows
+you to use arbitrary functions as actions and values. The compiler will then attempt to translate
+between your functions signature and OWW code.
+
+download workshop.json here:
+https://github.com/arxenix/owws-documentation/blob/master/workshop.json
+DISCLAIMER: I have not put any work into this, all credit goes to the creator of workshop.json,
+Arxenix.
+
 # How to create scripts
 
 OverScript files are normal Python modules with some restrictions.
