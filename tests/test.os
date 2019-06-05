@@ -1,10 +1,8 @@
 @event("global")
 def myNewRule():
-    l = [[1, 2, 3], [4, 5, 6]]
+    a = 15
+    b = 24
+    c = testUtilityFunction()
 
-    a = l[0]
-    b = l[1]
-    c = cosineFromDegrees(a)
-
-def testUtilityFunction(a, b):
+def testUtilityFunction():
     return a + b

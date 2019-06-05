@@ -11,11 +11,12 @@ Currently supported features are:
 	- Support for list literals
 	- Support for many Python operators (assign, subscript, arithmetic, etc...)
 	- automatic string building
+	- utility functions
 
 Planned features include:
 
-	- utility functions
 	- support for elif clauses
+	- dynamic argument resolution for functions
 
 Known issues:
 

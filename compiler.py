@@ -46,6 +46,16 @@ OPERATORS = {
     "GtE": ">="
     }
 
+class FunctionReturned(Exception):
+
+    """
+    Exception that is raised when a function returns
+    """
+
+    def __init__(self, value):
+        self.value = value
+        return super().__init__()
+
 class TOS():
 
     """
@@ -156,8 +166,10 @@ class OverScriptCompiler():
 
     def _prepare(self):
 
+        self.logger.debug("Clearing cache...")
         self.rules = []
         self._utilityFunctions = {}
+        self._usedFunctions = set() #keeps track of functions used in current call stack
         self._currentRule = None
         self._currentComment = ""
 
@@ -334,16 +346,21 @@ class OverScriptCompiler():
         tree = ast.parse(source)
         assert isinstance(tree, ast.Module)
         self.logger.debug("Reading function definitions...")
+        rules = []
         for rule in tree.body:
             if isinstance(rule, ast.FunctionDef):
                 if rule.decorator_list:
                     #Event handler function
-                    self._parseFunctionDefAsRule(rule)
+                    rules.append(rule)
                 else:
                     self._parseFunctionDefAsUtility(rule)
 
         self.logger.debug("Building ruleset...")
         
+        #do this after parsing utility functions to prevent issues
+        for rule in rules: 
+            self._parseFunctionDefAsRule(rule)
+
         self.code += "\n\n".join(map(str, self.rules))
 
         self.logger.debug("Done!")
@@ -420,7 +437,23 @@ class OverScriptCompiler():
         specified func_name function.
         """
 
-        pass
+        if not func_name in self._utilityFunctions:
+            raise ValueError("No such function: '%s'" % func_name)
+
+        if func_name in self._usedFunctions:
+            raise RecursionError("Recursion not allowed in utility functions.")
+
+        self._usedFunctions.add(func_name)
+
+        func = self._utilityFunctions[func_name]
+        try:
+            for instr in func.body:
+                self._parseBody(instr)
+        except FunctionReturned as e:
+            self._usedFunctions.discard(func_name)
+            return e.value
+        self._usedFunctions.discard(func_name)
+        return None
 
     def _parseFunctionDefAsUtility(self, node):
 
@@ -429,6 +462,7 @@ class OverScriptCompiler():
         """
 
         self._utilityFunctions[node.name] = node
+        self.logger.debug("Registered '%s' as utility function." % node.name)
 
     def _parseBody(self, node):
 
@@ -457,6 +491,8 @@ class OverScriptCompiler():
             self.addAction(self._assign(assignNode))
         elif isinstance(node, ast.For):
             self._parseFor(node)
+        elif isinstance(node, ast.Return):
+            raise FunctionReturned(self._parseExpr(node.value))
         else:
             raise RuntimeError("Unsupported node %s" % str(node))
 
@@ -644,13 +680,16 @@ class OverScriptCompiler():
 
         funcName = node.func.id
 
-        #TODO: add utility function calls here
 
         #prepare arguments
         args = node.args
         kwargs = {}
         for keyword in node.keywords:
             kwargs[keyword.arg] = self._parseExpr(keyword.value)
+
+        #utility functions
+        if funcName in self._utilityFunctions:
+            return self._resolveUtilityFunction(funcName, args, kwargs)
 
         if not hasattr(owwlib, funcName):
             if not self.parseUnknownFunctions:
