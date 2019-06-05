@@ -31,12 +31,15 @@ JSON documentation. Since not all of these are currently implemented natively, i
 to download workshop.json and place the file in the res folder in the compilers root directory.
 OSC will automatically load the file at startup and use it to resolve function calls to actions
 and values during compilation.
+
 If you can't use this feature for whatever reason, passing the -g flag to the compiler allows
 you to use arbitrary functions as actions and values. The compiler will then attempt to translate
 between your functions signature and OWW code.
 
 download workshop.json here:
+
 https://github.com/arxenix/owws-documentation/blob/master/workshop.json
+
 DISCLAIMER: I have not put any work into this, all credit goes to the creator of workshop.json,
 Arxenix.
 
