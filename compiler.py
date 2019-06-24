@@ -1,4 +1,4 @@
-#AST walker for Python that creates Overwatch Workshop scripts
+﻿#AST walker for Python that creates Overwatch Workshop scripts
 
 #Copyright (c) 2019 fredi_68
 
@@ -201,6 +201,7 @@ class OverScriptCompiler():
 
         self.global_var_names = {}
         self.player_var_names = {}
+        self.func_local_var_names = {}
 
         self.code = ""
 
@@ -471,7 +472,9 @@ class OverScriptCompiler():
 
         self._usedFunctions.add(func_name)
 
+        #safety check for recursion
         func = self._utilityFunctions[func_name]
+
         try:
             for instr in func.body:
                 self._parseBody(instr)
@@ -576,9 +579,13 @@ class OverScriptCompiler():
         if len(ops) > 1:
             raise NotImplementedError("Multiple comparison operators are not supported by OverScript.")
         opName = ops[0].__class__.__name__
-        try:
+        if opName in OPERATORS:
             op = OPERATORS[opName]
-        except KeyError:
+        elif opName == "In":
+            #special case for use with Array Contains
+            array = self._parseExpr(node.comparators[0])
+            return "Array Contains(%s, %s)" % (array, left)
+        else:
             raise NotImplementedError("Unknown operator '%s'." % opName)
         comps = node.comparators
         if len(comps) > 1:
@@ -628,7 +635,7 @@ class OverScriptCompiler():
         lastLoopBranch = self._curLoopBranch
 
         #set loop branch target
-        expr = self._parseCompare(node.test)
+        expr = self._parseExpr(node.test)
         
         currentInd = self.currentLine() #This is where we jump to
         self.addAction("PLACEHOLDER") #where we skip the loop if the condition doesn't hold

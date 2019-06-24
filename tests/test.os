@@ -1,9 +1,8 @@
 @event("global")
 def myNewRule():
-    a = 15
-    b = 24
-    c = testUtilityFunction()
-    d = cosineFromDegrees(b)
+    a = 0
+    while True:
+        a += 1
 
-def testUtilityFunction():
+def testUtilityFunction(a, b):
     return a + b
