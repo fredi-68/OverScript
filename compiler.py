@@ -146,6 +146,13 @@ class OverScriptCompiler():
         F - Array assembly target
     """
 
+    VS_VAR = "A"
+    VS_LBS = "B"
+    VS_LIS = "C"
+    VS_AAS = "D"
+    VS_ASR = "E"
+    VS_AAT = "F"
+
     logger = logging.getLogger("OSCompiler")
 
     def __init__(self, optimize=False, parseUnknownFunctions=False):
@@ -161,6 +168,7 @@ class OverScriptCompiler():
 
         self.optimize = optimize
         self.parseUnknownFunctions = parseUnknownFunctions
+        self.used_vars = (self.VS_VAR, self.VS_LBS, self.VS_LIS, self.VS_AAS, self.VS_ASR, self.VS_AAT)
 
         self._prepare()
         self.stringParser = StringParser()

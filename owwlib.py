@@ -36,6 +36,7 @@
 #make sure to define builtins that we will override
 #so we can still access them later
 _range = __builtins__["range"]
+_input = __builtins__["input"]
 
 #======================
 #ACTIONS
@@ -161,3 +162,28 @@ len = countOf
 #======================
 #OTHER
 #======================
+
+#I/O
+def input(ctx, var, player=None):
+
+    var = ctx._parseExpr(var)
+    if var in ctx.used_vars:
+        raise RuntimeError("Use of external variable %s prohibited: Variable is already in use by the compiler." % var)
+
+    if player is not None:
+        player = ctx._parseExpr(player)
+        return "Player Variable(%s, %s)" % (player, var)
+
+    return "Global Variable(%s)" % var
+
+def output(ctx, value, var, player=None):
+
+    var = ctx._parseExpr(var)
+    if var in ctx.used_vars:
+        raise RuntimeError("Use of external variable %s prohibited: Variable is already in use by the compiler." % var)
+
+    if player is not None:
+        player = ctx._parseExpr(player)
+        return "Set Player Variable(%s, %s, %s)" % (player, var, ctx._parseExpr(value))
+
+    return "Set Global Variable(%s, %s)" % (var, ctx._parseExpr(value))
