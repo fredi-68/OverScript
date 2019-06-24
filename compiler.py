@@ -773,6 +773,10 @@ class OverScriptCompiler():
         elif isinstance(node, ast.Name):
             if node.id == "player":
                 value = "Event Player"
+            elif node.id == "attacker":
+                value = "Attacker"
+            elif node.id == "Victim":
+                value = "Victim"
             else:
                 value = self.getVariable(node.id)
         elif isinstance(node, ast.Subscript):
