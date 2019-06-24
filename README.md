@@ -66,6 +66,9 @@ There are some special keywords and operators available as shorthands for common
 
 	-Value In Array is available through subscript (e.g. myList[0])
 
+	-Compare() will automatically be used for boolean comparison operations. For example,
+	`health > 0` will be translated to `Compare(<value of health>, >, 0)`.
+
 To edit the event or condition settings for a rule, you can use function decorators:
 
 	- `@event` lets you specify the event type of this rule. You are only allowed
