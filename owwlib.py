@@ -187,3 +187,17 @@ def output(ctx, value, var, player=None):
         return "Set Player Variable(%s, %s, %s)" % (player, var, ctx._parseExpr(value))
 
     return "Set Global Variable(%s, %s)" % (var, ctx._parseExpr(value))
+
+#Override standard variable I/O to raise an exception if used
+def setGlobalVariable(*args):
+    raise SyntaxError("Use of setGlobalVariable is prohibited. Use output() instead.")
+def setPlayerVariable(*args):
+    raise SyntaxError("Use of setPlayerVariable is prohibited. Use output() instead.")
+def setGlobalVariableAtIndex(*args):
+    raise SyntaxError("Use of setGlobalVariableAtIndex is prohibited. Use output() instead.")
+def setPlayerVariableAtIndex(*args):
+    raise SyntaxError("Use of setPlayerVariableAtIndex is prohibited. Use output() instead.")
+def globalVariable(*args):
+    raise SyntaxError("Use of globalVariable is prohibited. Use input() instead.")
+def playerVariable(*args):
+    raise SyntaxError("Use of playerVariable is prohibited. Use input() instead.")
