@@ -12,6 +12,7 @@ class StringParser():
     SYMBOLS = "-></*-+=()!?"
     PARAM_REPLACE_RE = re.compile("(\\\\{[0-9]\\\\})")
     PARAM_MATCH_RE = re.compile("^\\{([0-9])\\}")
+    PARAM_ONLY_RE = re.compile("^\\{([0-9]+?)\\}$")
 
     logger = logging.getLogger("OS.StringParser")
 
@@ -102,6 +103,12 @@ class StringParser():
         """
 
         final_string = ""
+
+        #special case for when the string passed to the parse() method
+        #is literally just "{n}"
+        m = self.PARAM_ONLY_RE.fullmatch(s)
+        if m is not None:
+            return params[int(m.group(1))]
 
         for template in self.words:
             temp_re = "^%s$" % re.sub(self.PARAM_REPLACE_RE, "(.+)", re.escape(template))
