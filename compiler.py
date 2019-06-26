@@ -155,7 +155,7 @@ class OverScriptCompiler():
 
     logger = logging.getLogger("OSCompiler")
 
-    def __init__(self, optimize=False, parseUnknownFunctions=False):
+    def __init__(self, optimize=False, parseUnknownFunctions=False, correctAccents=True):
 
         """
         Create a new compiler instance.
@@ -164,10 +164,19 @@ class OverScriptCompiler():
             The compiler always uses all code optimizations available, but many things such as
             comments or additional linebreaks and spaces for better readability may be omitted
             if optimize=False.
+        parseUnknownFunctions determines how the compiler handles unknown function signatures.
+            If set to False, any unknown function call raises an exception. If set to True,
+            the compiler instead assumes that the function exists on the workshop instead and
+            attempts to translate it. No argument checking will be performed in this case.
+            This is a dangerous option to use but may be unavoidable in certain situations.
+        correctAccents controls the use of input filters that transform commonly used synonyms
+            of literals to their correct spelling. For example, "Lucio" will be turned into
+            "Lúcio". If this option is set to False, filters will log a warning instead.
         """
 
         self.optimize = optimize
         self.parseUnknownFunctions = parseUnknownFunctions
+        self.correctAccents = correctAccents
         self.used_vars = (self.VS_VAR, self.VS_LBS, self.VS_LIS, self.VS_AAS, self.VS_ASR, self.VS_AAT)
 
         self._prepare()
@@ -799,6 +808,11 @@ class OverScriptCompiler():
             value = self.getVariable(attr, player)
         else:
             value = str(ast.literal_eval(node))
+            if self.correctAccents:
+                value = value.replace("Lucio", "Lúcio") #allow the qwerty-friendly spelling of Lucio
+            else:
+                if value.find("Lucio") > -1:
+                    self.logger.warn("String 'Lucio' at line %i, column %i is a common misspelling of 'Lúcio'." % (node.lineno, node.col_offset))
 
         return value
 

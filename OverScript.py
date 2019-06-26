@@ -1,4 +1,4 @@
-#Copyright (c) 2019 fredi_68
+﻿#Copyright (c) 2019 fredi_68
 
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -40,6 +40,7 @@ parser.add_argument("-v", "--verbose", action="count", default=0, help="Set logg
 parser.add_argument("-o", "--out", action="store", help="Set output file path")
 parser.add_argument("-O", "--optimize", action="store_true", help="optimize output")
 parser.add_argument("-g", "--guess", action="store_true", help="attempt to guess unknown functions instead of raising error")
+parser.add_argument("-c", "--correct-accents", action="store_true", help="use text filters to correct common misspellings of string literals")
 parser.add_argument("source", nargs="+")
 
 args = parser.parse_args()
@@ -49,7 +50,7 @@ else:
     logging.basicConfig(level=logging.DEBUG)
 
 p_in = args.source
-compiler = OverScriptCompiler(optimize=args.optimize, parseUnknownFunctions=args.guess)
+compiler = OverScriptCompiler(optimize=args.optimize, parseUnknownFunctions=args.guess, correctAccents=args.correct_accents)
 for i in p_in:
     path = pathlib.Path(i)
     if not path.exists():

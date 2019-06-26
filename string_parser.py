@@ -10,8 +10,8 @@ import re
 class StringParser():
 
     SYMBOLS = "-></*-+=()!?"
-    PARAM_REPLACE_RE = re.compile("(\\\\{[0-9]\\\\})")
-    PARAM_MATCH_RE = re.compile("^\\{([0-9])\\}")
+    PARAM_REPLACE_RE = re.compile("(\\\\{[0-9]+?\\\\})")
+    PARAM_MATCH_RE = re.compile("^\\{([0-9]+?)\\}")
     PARAM_ONLY_RE = re.compile("^\\{([0-9]+?)\\}$")
 
     logger = logging.getLogger("OS.StringParser")
