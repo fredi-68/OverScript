@@ -22,6 +22,9 @@ Known issues:
 
 	- Some operations currently only work on global variables
 	- If your rule contains a loop, it will have a startup delay of 0.001 seconds.
+	- Due to how the workshop handles i18n, this compiler will only work for client languages
+	using English names for actions and values. For languages other than English that DO
+	use English actions/values, the string template list must be changed (located in res/strings.txt).
 
 
 # A Note on workshop.json
