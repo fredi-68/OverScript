@@ -19,6 +19,7 @@ class StringParser():
     def __init__(self, db_file="res/strings.txt"):
         
         self.words = []
+        self.us_words = []
         if db_file:
             self.loadWords(db_file)
 
@@ -45,6 +46,12 @@ class StringParser():
 
         #Right so I don't have fancy incremental sorting like C# does.
         #What I *can* do is split the list into multiple lists, then merge
+
+        #TODO: temporary fix
+        for i in self.words:
+            if "_" in i:
+                j = i.replace("_", " ")
+                self.us_words.append((i, j))
 
         hasParam = []
         for i in self.words[:]:
@@ -83,7 +90,7 @@ class StringParser():
 
         self.words.reverse()
 
-    def parse(self, s, params):
+    def parse(self, s, params, depth=0):
 
         """
         Parse a string into a value understood by OWW.
@@ -104,6 +111,11 @@ class StringParser():
 
         final_string = ""
 
+        #TODO: temporary fix
+        if not depth:
+            for template, phrase in self.us_words:
+                s = s.replace(phrase, template)
+
         #special case for when the string passed to the parse() method
         #is literally just "{n}"
         m = self.PARAM_ONLY_RE.fullmatch(s)
@@ -118,8 +130,10 @@ class StringParser():
             if match is not None:
                 try:
                     self.logger.debug("Match found: %s" % template)
-                
-                    string_args = ['"%s"' % template]
+
+                    #TODO: Temporary fix
+                    #string_args = ['"%s"' % template]
+                    string_args = ['"%s"' % template.replace("_", " ")]
                     #check parameters
                     for group in match.groups():
                         #is parameter formatted?
