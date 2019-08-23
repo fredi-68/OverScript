@@ -54,7 +54,7 @@ The name of the function will determine the name of the rule. Now you can
 write any code you want inside this rule and it will be converted to workshop
 code during compilation. To access workshop values or actions, you can call them
 as functions. In general most functions have the same name as their workshop
-equivalent, sometimes abreviated. However, in case the function has more than
+equivalent, sometimes abbreviated. However, in case the function has more than
 one word, I am using lowerCamelCase instead of spaces. Actions add the respective
 action to the action list, values return the result of the function.
 
