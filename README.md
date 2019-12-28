@@ -1,3 +1,6 @@
+# DISCLAIMER: BROKEN SOFTWARE
+This compiler has been lagging behind the Overwatch Workshop feature set for some time now. A bunch of stuff was changed and it is likely that this project does not work at all anymore. While I want to try and fix this, I am currently stuck on redesigning the variable system to allow for better control of functions and specifically recursion, and until that changes, this will most likely not be usable at all. Sorry.
+
 # OverScript - Overwatch Workshop Script Compiler for Python 3
 
 This is a compiler, which turns Python 3 code into workshop rules
